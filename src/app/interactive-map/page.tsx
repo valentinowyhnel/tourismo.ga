@@ -1,7 +1,7 @@
 // Using 'use client' for Leaflet map and interactivity
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react'; // Added useCallback
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import { getProvincesData } from '@/data/provinces';
@@ -42,14 +42,18 @@ export default function InteractiveMapPage() {
     fetchData();
   }, []);
   
-  const handleProvinceSelect = (provinceId: string | null) => {
+  const handleProvinceSelect = useCallback((provinceId: string | null) => {
     if (provinceId === null) {
       setSelectedProvince(null);
       return;
     }
-    const province = provinces.find(p => p.id === provinceId);
-    setSelectedProvince(province || null);
-  };
+    if (provinces.length > 0) {
+      const province = provinces.find(p => p.id === provinceId);
+      setSelectedProvince(province || null);
+    } else {
+      setSelectedProvince(null); 
+    }
+  }, [provinces]);
 
   const provinceMarkers = useMemo(() => 
     provinces.map(p => ({
@@ -68,7 +72,12 @@ export default function InteractiveMapPage() {
     return () => {
       document.removeEventListener('selectProvince', eventListener);
     };
-  }, [provinces]);
+  }, [handleProvinceSelect]); // Depends on memoized handleProvinceSelect
+
+
+  const onLeafletMarkerClick = useCallback((id: string) => {
+    handleProvinceSelect(id);
+  }, [handleProvinceSelect]);
 
 
   return (
@@ -79,7 +88,10 @@ export default function InteractiveMapPage() {
             <Loader2 className="h-10 w-10 animate-spin text-primary" />
           </div>
         ) : (
-          <LeafletMap markers={provinceMarkers} selectedProvinceId={selectedProvince?.id} onMarkerClick={(id) => handleProvinceSelect(id)} />
+          <LeafletMap 
+            markers={provinceMarkers} 
+            selectedProvinceId={selectedProvince?.id} 
+            onMarkerClick={onLeafletMarkerClick} />
         )}
       </div>
       <aside className="w-full md:w-1/3 h-1/2 md:h-full bg-background border-l border-border shadow-lg">
