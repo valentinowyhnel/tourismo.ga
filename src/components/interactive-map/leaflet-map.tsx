@@ -3,7 +3,7 @@
 import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet';
 import type { LatLngExpression } from 'leaflet';
 import L from 'leaflet';
-import { useEffect, useState } from 'react'; // Removed useRef, added useState
+import { useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for default icon path issue
@@ -18,8 +18,8 @@ interface LeafletMapProps {
   markers: { position: [number, number]; popupContent: string; id: string }[];
   selectedProvinceId?: string | null;
   onMarkerClick?: (id: string) => void;
-  center?: [number, number];
-  zoom?: number;
+  center?: [number, number]; // Prop for initial center for LeafletMap component
+  zoom?: number; // Prop for initial zoom for LeafletMap component
 }
 
 const defaultCenter: [number, number] = [-0.5, 11.75]; // Centered on Gabon
@@ -29,13 +29,17 @@ export default function LeafletMap({
   markers,
   selectedProvinceId,
   onMarkerClick,
-  center: initialCenter = defaultCenter,
-  zoom: initialZoom = defaultZoom,
+  center: initialCenterFromProps = defaultCenter, // Use prop or default
+  zoom: initialZoomFromProps = defaultZoom,     // Use prop or default
 }: LeafletMapProps) {
-  const [map, setMap] = useState<L.Map | null>(null); // State for map instance
+  const [map, setMap] = useState<L.Map | null>(null);
+  
+  // Store initial center/zoom in state for MapContainer's props, ensuring they are stable
+  const [containerCenter] = useState<LatLngExpression>(initialCenterFromProps);
+  const [containerZoom] = useState<number>(initialZoomFromProps);
 
   useEffect(() => {
-    if (!map) return; // Guard: if map is not yet available, do nothing
+    if (!map) return; 
 
     if (selectedProvinceId) {
       const selectedMarkerData = markers.find((m) => m.id === selectedProvinceId);
@@ -43,20 +47,21 @@ export default function LeafletMap({
         map.setView(selectedMarkerData.position as LatLngExpression, 8);
       } else {
         // Fallback if selectedProvinceId is present but not found in markers
-        map.setView(initialCenter as LatLngExpression, initialZoom);
+        map.setView(initialCenterFromProps as LatLngExpression, initialZoomFromProps);
       }
     } else {
-      map.setView(initialCenter as LatLngExpression, initialZoom);
+      // No selected province, use initial view defined by props or defaults
+      map.setView(initialCenterFromProps as LatLngExpression, initialZoomFromProps);
     }
-  }, [map, selectedProvinceId, markers, initialCenter, initialZoom]); // useEffect depends on `map` state
+  }, [map, selectedProvinceId, markers, initialCenterFromProps, initialZoomFromProps]);
 
   return (
     <MapContainer
-      center={initialCenter} // Use initialCenter for initial setup
-      zoom={initialZoom}   // Use initialZoom for initial setup
+      center={containerCenter} // Use stable state for MapContainer's initial center prop
+      zoom={containerZoom}     // Use stable state for MapContainer's initial zoom prop
       style={{ height: '100%', width: '100%' }}
       scrollWheelZoom={true}
-      whenCreated={setMap} // Use whenCreated to set the map instance via state
+      whenCreated={setMap} 
       className="rounded-lg"
     >
       <TileLayer
