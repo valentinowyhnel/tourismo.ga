@@ -1,6 +1,7 @@
 import type {Metadata} from 'next';
 import { Inter as FontSans } from 'next/font/google';
 import './globals.css';
+import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/common/header';
 import { Footer } from '@/components/common/footer';
@@ -14,7 +15,7 @@ const fontSans = FontSans({
 export const metadata: Metadata = {
   title: 'Gabon Explorer - Discover Gabon',
   description: 'Explore the rich natural beauty and culture of Gabon. Plan your adventure today!',
-  keywords: ['Gabon', 'tourism', 'travel', 'Africa', 'national parks', 'wildlife', 'culture'],
+  keywords: ['Gabon', 'tourism', 'travel', 'Africa', 'national parks', 'wildlife', 'culture', 'interactive map'],
 };
 
 export default function RootLayout({
@@ -32,7 +33,9 @@ export default function RootLayout({
       >
         <div className="flex flex-col min-h-screen">
           <Header />
-          <main className="flex-grow">{children}</main>
+          <main className="flex-grow flex flex-col">{/* Ensure main can flex its children column-wise */}
+            {children}
+          </main>
           <Footer />
         </div>
         <Toaster />

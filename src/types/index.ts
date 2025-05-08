@@ -1,4 +1,5 @@
 
+
 export interface Review {
   id: string;
   user: string;
@@ -30,4 +31,21 @@ export interface Destination {
   tags?: string[];
   activities?: string[];
   bestTimeToVisit?: string;
+}
+
+export interface ProvinceImage {
+  url: string;
+  alt?: string;
+  aiHint?: string;
+}
+
+export interface Province {
+  id: string; // e.g. 'estuaire'
+  name: string; // e.g. 'Estuaire'
+  center: [number, number]; // [lat, lng] for map marker
+  brief?: string; // Short description for the panel header
+  flora?: string; // Description of typical flora
+  fauna?: string; // Description of emblematic fauna
+  parks?: string[]; // List of park/reserve names
+  images?: ProvinceImage[]; // Optional photo gallery
 }

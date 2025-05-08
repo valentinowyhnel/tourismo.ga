@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Leaf, Landmark, Compass, Home, ClipboardList, Menu, X } from 'lucide-react';
+import { Leaf, MapIcon as Compass, Home, ClipboardList, Menu, X, Map } from 'lucide-react'; // Renamed Compass to MapIcon, added Map
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { useState } from 'react';
@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 const navLinks = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/#destinations', label: 'Destinations', icon: Compass },
+  { href: '/interactive-map', label: 'Carte Interactive', icon: Map },
   { href: '/trip-planner', label: 'Trip Planner', icon: ClipboardList },
 ];
 
@@ -25,7 +26,7 @@ export function Header() {
         className={cn(
           "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
           "hover:bg-primary/10 hover:text-primary",
-          pathname === href ? "text-primary font-semibold" : "text-foreground/80"
+          (pathname === href || (href === '/#destinations' && pathname.startsWith('/destinations'))) ? "text-primary font-semibold" : "text-foreground/80"
         )}
       >
         <Icon className="h-5 w-5" />
